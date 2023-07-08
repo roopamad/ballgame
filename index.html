@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    #container {
+      position: relative;
+      width: 1400px;
+      height: 700px;
+      border: 1px solid #000;
+      overflow: hidden;
+    }
+    
+    #ball {
+      position: absolute;
+      width: 70px;
+      height: 70px;
+      background-color: red;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    
+    #message {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 24px;
+      color: rgb(169, 20, 20);
+      background-color: rgb(234, 227, 227);
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <div id="ball"></div>
+    <div id="message">Your Quotation comes here.</div>
+  </div>
+
+  <script>
+    var container = document.getElementById("container");
+    var ball = document.getElementById("ball");
+    var message = document.getElementById("message");
+    var gameEnded = false;
+    var hasClickedBall = false;
+
+    container.addEventListener("mousemove", function(event) {
+      if (gameEnded) {
+        return;
+      }
+      
+      if (isMouseOverBall(event) && !hasClickedBall) {
+        ball.style.backgroundColor = "green";
+      } else {
+        ball.style.backgroundColor = "red";
+      }
+    });
+
+    container.addEventListener("click", function(event) {
+      if (gameEnded) {
+        return;
+      }
+      
+      if (isMouseOverBall(event) && !hasClickedBall) {
+        hasClickedBall = true;
+        endGame();
+      }
+    });
+
+    function startGame() {
+      message.style.display = "none";
+      animateBall();
+    }
+
+    function animateBall() {
+      var containerWidth = container.offsetWidth;
+      var containerHeight = container.offsetHeight;
+      var ballWidth = ball.offsetWidth;
+      var ballHeight = ball.offsetHeight;
+      var ballX = getRandomNumber(ballWidth, containerWidth - ballWidth);
+      var ballY = getRandomNumber(ballHeight, containerHeight - ballHeight);
+      var speedX = getRandomSpeed();
+      var speedY = getRandomSpeed();
+
+      function updateBallPosition() {
+        if (gameEnded) {
+          return;
+        }
+
+        ballX += speedX;
+        ballY += speedY;
+
+        if (ballX + ballWidth >= containerWidth || ballX <= 0) {
+          speedX *= -1;
+        }
+        if (ballY + ballHeight >= containerHeight || ballY <= 0) {
+          speedY *= -1;
+        }
+
+        ball.style.left = ballX + "px";
+        ball.style.top = ballY + "px";
+
+        if (!gameEnded) {
+          requestAnimationFrame(updateBallPosition);
+        }
+      }
+
+      updateBallPosition();
+    }
+
+    function endGame() {
+      gameEnded = true;
+      ball.style.display = "none";
+      message.style.display = "block";
+    }
+
+    function isMouseOverBall(event) {
+      var mouseX = event.clientX;
+      var mouseY = event.clientY;
+      var ballRect = ball.getBoundingClientRect();
+
+      return (
+        mouseX >= ballRect.left &&
+        mouseX <= ballRect.right &&
+        mouseY >= ballRect.top &&
+        mouseY <= ballRect.bottom
+      );
+    }
+
+    function getRandomNumber(min, max) {
+      return Math.floor(Math.random() * (max - min + 1) + min);
+   }
+
+    function getRandomSpeed() {
+      return Math.random() * (7 - 2) + 2;
+    }
+
+    startGame();
+  </script>
+</body>
+</html>
